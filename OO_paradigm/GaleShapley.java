@@ -1,5 +1,7 @@
 // Imports
+import java.io.FileReader;
 import java.util.HashMap;
+import java.util.
 
 /** Basic Gale Shapley algorithm class for CSI2120 project
  * 
@@ -19,6 +21,7 @@ public class GaleShapley {
      * @param filename
      */
     public void loadResidents(String filename){
+        FileReader filereader = new FileReader(filename);
 
     }
 
