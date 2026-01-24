@@ -64,8 +64,44 @@ public class GaleShapley {
     /** Reads the programs from the csv file
      * @param filename
      */
-    public ArrayList<Program> loadPrograms(String filename){
+    public ArrayList<Program> loadPrograms(String filename) throws FileNotFoundException{
+        ArrayList<Program> programs = new ArrayList<>();
 
-        return null;
+        try(BufferedReader buffread = new BufferedReader(new FileReader(filename))){
+            String line;
+
+            buffread.readLine();
+
+            while((line = buffread.readLine()) != null){
+                String[] attributes = line.split(",");
+
+                if(attributes.length != 4) return null;
+
+                String id = attributes[0].trim();
+                String name = attributes[1].trim();
+                int quota = Integer.parseInt(attributes[2].trim());
+
+                String roles = attributes[3].replace("[","").replace("]", "");
+                String[] r_parts = roles.split("\\s*,\\s*");
+                List<Integer> rol = new ArrayList<>();
+
+                for(String r : r_parts){
+                    rol.add(Integer.parseInt(r));
+                }
+
+
+                Program res = new Program(id,quota,name,rol,null);
+
+                if(res != null){
+                    programs.add(res);
+                }
+            }
+
+
+        } catch(IOException e){
+            System.out.println("Error caught: " + e.getMessage());
+        }
+
+        return programs;
     }
 }
