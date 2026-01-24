@@ -1,7 +1,12 @@
 // Imports
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.HashMap;
-import java.util.
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.io.BufferedReader;
+import java.util.List;
 
 /** Basic Gale Shapley algorithm class for CSI2120 project
  * 
@@ -20,19 +25,47 @@ public class GaleShapley {
     /** Reads the residents from the csv file
      * @param filename
      */
-    public void loadResidents(String filename){
-        FileReader filereader = new FileReader(filename);
+    public ArrayList<Resident> loadResidents(String filename) throws FileNotFoundException{
+        ArrayList<Resident> residents = new ArrayList<>();
 
+        try(BufferedReader buffread = new BufferedReader(new FileReader(filename))){
+            String line;
+
+            buffread.readLine();
+
+            while((line = buffread.readLine()) != null){
+                String[] attributes = line.split(",");
+
+                if(attributes.length != 4) return null;
+
+                int id = Integer.parseInt(attributes[0].trim());
+                String fn = attributes[1].trim();
+                String ln = attributes[2].trim();
+
+                String roles = attributes[3].replace("[","").replace("]", "");
+                List<String> rol = Arrays.asList(roles.split("\\s*,\\s*"));
+
+
+                Resident res = new Resident(id, fn, ln, rol);
+
+                if(res != null){
+                    residents.add(res);
+                }
+            }
+
+
+        } catch(IOException e){
+            System.out.println("Error caught: " + e.getMessage());
+        }
+
+        return residents;
     }
-
 
     /** Reads the programs from the csv file
      * @param filename
      */
-    public void loadPrograms(String filename){
+    public ArrayList<Program> loadPrograms(String filename){
 
-
+        return null;
     }
-
-
 }

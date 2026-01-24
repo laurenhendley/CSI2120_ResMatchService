@@ -9,7 +9,7 @@ class Resident {
     private int id;
     private String firstname;
     private String lastname;
-    private List<Integer> rol;
+    private List<String> rol;
     private Program matchedProgram;
     private int matchedRank;
 
@@ -21,7 +21,7 @@ class Resident {
      * @param mp
      * @param matchedRank
      */
-    public Resident(int id, String fn, String ln, List<Integer> rol, Program mp, int matchedRank){
+    public Resident(int id, String fn, String ln, List<String> rol, Program mp, int matchedRank){
         this.id = id;
         this.firstname = fn;
         this.lastname = ln;
@@ -36,7 +36,7 @@ class Resident {
      * @param ln
      * @param rol
      */
-    public Resident(int id, String fn, String ln, List<Integer> rol){
+    public Resident(int id, String fn, String ln, List<String> rol){
         this.id = id;
         this.firstname = fn;
         this.lastname = ln;
@@ -79,9 +79,9 @@ class Resident {
     // Rol
 
     /** @return rol */
-    public List<Integer> getRol(){ return rol; }
+    public List<String> getRol(){ return rol; }
     /** @param rol */
-    public void setRol(List<Integer> rol){ this.rol = rol; }
+    public void setRol(List<String> rol){ this.rol = rol; }
 
 
     // MatchedProgram
