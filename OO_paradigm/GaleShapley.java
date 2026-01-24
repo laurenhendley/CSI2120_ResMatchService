@@ -1,5 +1,4 @@
 // Imports
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.io.IOException;
@@ -25,7 +24,7 @@ public class GaleShapley {
     /** Reads the residents from the csv file
      * @param filename
      */
-    public ArrayList<Resident> loadResidents(String filename) throws FileNotFoundException{
+    public static ArrayList<Resident> loadResidents(String filename) {
         ArrayList<Resident> residents = new ArrayList<>();
 
         try(BufferedReader buffread = new BufferedReader(new FileReader(filename))){
@@ -34,11 +33,11 @@ public class GaleShapley {
             buffread.readLine();
 
             while((line = buffread.readLine()) != null){
-                String[] attributes = line.split(",");
+                String[] attributes = line.split(",", 4);
 
-                if(attributes.length != 4) return null;
+                if(attributes.length != 4) continue;
 
-                int id = Integer.parseInt(attributes[0].trim());
+                int id = Integer.parseInt(attributes[0].replace("\"","").trim());
                 String fn = attributes[1].trim();
                 String ln = attributes[2].trim();
 
@@ -64,7 +63,7 @@ public class GaleShapley {
     /** Reads the programs from the csv file
      * @param filename
      */
-    public ArrayList<Program> loadPrograms(String filename) throws FileNotFoundException{
+    public static ArrayList<Program> loadPrograms(String filename) {
         ArrayList<Program> programs = new ArrayList<>();
 
         try(BufferedReader buffread = new BufferedReader(new FileReader(filename))){
@@ -73,35 +72,36 @@ public class GaleShapley {
             buffread.readLine();
 
             while((line = buffread.readLine()) != null){
-                String[] attributes = line.split(",");
+                String[] attributes = line.split(",", 4);
 
-                if(attributes.length != 4) return null;
+                if(attributes.length != 4) continue;
 
-                String id = attributes[0].trim();
+                String id = attributes[0].replace("\"","").trim();
                 String name = attributes[1].trim();
-                int quota = Integer.parseInt(attributes[2].trim());
+                int quota = Integer.parseInt(attributes[2].replace("\"","").trim());
 
                 String roles = attributes[3].replace("[","").replace("]", "");
                 String[] r_parts = roles.split("\\s*,\\s*");
                 List<Integer> rol = new ArrayList<>();
 
                 for(String r : r_parts){
-                    rol.add(Integer.parseInt(r));
+                    rol.add(Integer.parseInt(r.replace("\"","").trim()));
                 }
 
 
-                Program res = new Program(id,quota,name,rol,null);
+                Program prog = new Program(id,quota,name,rol,null);
 
-                if(res != null){
-                    programs.add(res);
+                if(prog != null){
+                    programs.add(prog);
                 }
             }
+
+        
 
 
         } catch(IOException e){
             System.out.println("Error caught: " + e.getMessage());
         }
-
         return programs;
     }
 }
