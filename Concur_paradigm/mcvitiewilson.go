@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+// CUSTOM DATA TYPES
+
 // The Resident data type
 type Resident struct {
 	residentID     int
@@ -26,8 +28,16 @@ type Program struct {
 	// for the selected resident IDs
 }
 
+// The selectedResidents data type
 type selectedResidents struct {
+	residentID     int
+	firstname      string
+	lastname       string
+	rol            []string // resident rank order list
+	matchedProgram string   // will be "" for unmatched resident
 }
+
+// HELPER FUNCTIONS
 
 func offer(rid int, residents map[int]*Resident, programs map[string]*Program)
 

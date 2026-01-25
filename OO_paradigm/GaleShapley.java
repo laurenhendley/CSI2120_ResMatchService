@@ -24,7 +24,7 @@ public class GaleShapley {
     /** Reads the residents from the csv file
      * @param filename
      */
-    public static ArrayList<Resident> loadResidents(String filename) {
+    public ArrayList<Resident> loadResidents(String filename) {
         ArrayList<Resident> residents = new ArrayList<>();
 
         try(BufferedReader buffread = new BufferedReader(new FileReader(filename))){
@@ -49,6 +49,7 @@ public class GaleShapley {
 
                 if(res != null){
                     residents.add(res);
+                    idToRes.put(id, res);
                 }
             }
 
@@ -63,7 +64,7 @@ public class GaleShapley {
     /** Reads the programs from the csv file
      * @param filename
      */
-    public static ArrayList<Program> loadPrograms(String filename) {
+    public ArrayList<Program> loadPrograms(String filename) {
         ArrayList<Program> programs = new ArrayList<>();
 
         try(BufferedReader buffread = new BufferedReader(new FileReader(filename))){
@@ -93,6 +94,7 @@ public class GaleShapley {
 
                 if(prog != null){
                     programs.add(prog);
+                    idToProg.put(id, prog);
                 }
             }
 
