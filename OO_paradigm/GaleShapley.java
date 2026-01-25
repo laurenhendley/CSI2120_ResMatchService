@@ -97,10 +97,7 @@ public class GaleShapley {
                     idToProg.put(id, prog);
                 }
             }
-
-        
-
-
+            
         } catch(IOException e){
             System.out.println("Error caught: " + e.getMessage());
         }
