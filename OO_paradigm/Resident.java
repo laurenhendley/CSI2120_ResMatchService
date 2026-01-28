@@ -13,6 +13,17 @@ class Resident {
     private Program matchedProgram;
     private int matchedRank;
 
+    /** Constructor with just id, first name, and last name
+     * @param id
+     * @param fname
+     * @param lname
+     */
+    public Resident(int id, String fname, String lname) {
+		this.id= id;
+		firstname= fname;
+		lastname= lname;
+	}
+
     /** Full resident constructor
      * @param id
      * @param fn

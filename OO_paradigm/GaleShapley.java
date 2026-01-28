@@ -17,90 +17,207 @@ import java.util.List;
  */
 public class GaleShapley {
     // Instatiating variables
-    HashMap<Integer, Resident> idToRes = new HashMap<>();
-    HashMap<String, Program> idToProg = new HashMap<>();
+    HashMap<Integer, Resident> residents;
+    HashMap<String, Program> programs;
 
     
     /** Reads the residents from the csv file
      * @param filename
+     * @throws IOException
+     * @throws NumberFormatException
      */
-    public ArrayList<Resident> loadResidents(String filename) {
-        ArrayList<Resident> residents = new ArrayList<>();
+    public void readResidents(String residentsFilename) throws IOException, NumberFormatException {
 
-        try(BufferedReader buffread = new BufferedReader(new FileReader(filename))){
-            String line;
+        String line;
+		residents = new HashMap<Integer,Resident>();
+		BufferedReader br = new BufferedReader(new FileReader(residentsFilename)); 
 
-            buffread.readLine();
+		int residentID;
+		String firstname;
+		String lastname;
+		String plist;
+		String[] rol;
 
-            while((line = buffread.readLine()) != null){
-                String[] attributes = line.split(",", 4);
+		// Read each line from the CSV file
+		line = br.readLine(); // skipping first line
+		while ((line = br.readLine()) != null && line.length() > 0) {
 
-                if(attributes.length != 4) continue;
+			int split;
+			int i;
 
-                int id = Integer.parseInt(attributes[0].replace("\"","").trim());
-                String fn = attributes[1].trim();
-                String ln = attributes[2].trim();
+			// extracts the resident ID
+			for (split=0; split < line.length(); split++) {
+				if (line.charAt(split) == ',') {
+					break;
+				} 
+			}
+			if (split > line.length()-2)
+				throw new IOException("Error: Invalid line format: " + line);
 
-                String roles = attributes[3].replace("[","").replace("]", "");
-                List<String> rol = Arrays.asList(roles.split("\\s*,\\s*"));
+			residentID= Integer.parseInt(line.substring(0,split));
+			split++;
 
+			// extracts the resident firstname
+			for (i= split ; i < line.length(); i++) {
+				if (line.charAt(i) == ',') {
+					break;
+				} 
+			}
+			if (i > line.length()-2)
+				throw new IOException("Error: Invalid line format: " + line);
 
-                Resident res = new Resident(id, fn, ln, rol);
+			firstname= line.substring(split,i);
+			split= i+1;
+			
+			// extracts the resident lastname
+			for (i= split ; i < line.length(); i++) {
+				if (line.charAt(i) == ',') {
+					break;
+				} 
+			}
+			if (i > line.length()-2)
+				throw new IOException("Error: Invalid line format: " + line);
 
-                if(res != null){
-                    residents.add(res);
-                    idToRes.put(id, res);
-                }
-            }
+			lastname= line.substring(split,i);
+			split= i+1;		
+				
+			Resident resident= new Resident(residentID,firstname,lastname);
 
+			for (i= split ; i < line.length(); i++) {
+				if (line.charAt(i) == '"') {
+					break;
+				} 
+			}
+			
+			// extracts the program list
+			plist= line.substring(i+2,line.length()-2);
+			String delimiter = ","; // Assuming values are separated by commas
+			rol = plist.split(delimiter);
+			
+			resident.setRol(Arrays.asList(rol));
+			
+			residents.put(residentID,resident);
 
-        } catch(IOException e){
-            System.out.println("Error caught: " + e.getMessage());
-        }
-
-        return residents;
+            br.close();
+		}	
     }
 
     /** Reads the programs from the csv file
      * @param filename
+     * @throws IOException
+     * @throws NumberFormatException
      */
-    public ArrayList<Program> loadPrograms(String filename) {
-        ArrayList<Program> programs = new ArrayList<>();
+    public void readPrograms(String programsFilename) throws IOException, NumberFormatException {
 
-        try(BufferedReader buffread = new BufferedReader(new FileReader(filename))){
-            String line;
+        String line;
+		programs= new HashMap<String,Program>();
+		BufferedReader br = new BufferedReader(new FileReader(programsFilename)); 
 
-            buffread.readLine();
+		String programID;
+		String name;
+		int quota;
+		String rlist;
+		int[] rol;
 
-            while((line = buffread.readLine()) != null){
-                String[] attributes = line.split(",", 4);
+		// Read each line from the CSV file
+		line = br.readLine(); // skipping first line
+		while ((line = br.readLine()) != null && line.length() > 0) {
 
-                if(attributes.length != 4) continue;
+			int split;
+			int i;
 
-                String id = attributes[0].replace("\"","").trim();
-                String name = attributes[1].trim();
-                int quota = Integer.parseInt(attributes[2].replace("\"","").trim());
-
-                String roles = attributes[3].replace("[","").replace("]", "");
-                String[] r_parts = roles.split("\\s*,\\s*");
-                List<Integer> rol = new ArrayList<>();
-
-                for(String r : r_parts){
-                    rol.add(Integer.parseInt(r.replace("\"","").trim()));
-                }
+			// extracts the program ID
+			for (split=0; split < line.length(); split++) {
+				if (line.charAt(split) == ',') {
+					break;
+				} 
+			}			
+			if (split > line.length()-2)
+				throw new IOException("Error: Invalid line format: " + line);
 
 
-                Program prog = new Program(id,quota,name,rol,null);
+			programID= line.substring(0,split);
+			split++;
 
-                if(prog != null){
-                    programs.add(prog);
-                    idToProg.put(id, prog);
-                }
+			// extracts the program name
+			for (i= split ; i < line.length(); i++) {
+				if (line.charAt(i) == ',') {
+					break;
+				} 
+			}
+			if (i > line.length()-2)
+				throw new IOException("Error: Invalid line format: " + line);
+			
+			name= line.substring(split,i);
+			split= i+1;
+			
+			// extracts the program quota
+			for (i= split ; i < line.length(); i++) {
+				if (line.charAt(i) == ',') {
+					break;
+				} 
+			}
+			if (i > line.length()-2)
+				throw new IOException("Error: Invalid line format: " + line);
+
+			quota= Integer.parseInt(line.substring(split,i));
+			split= i+1;		
+				
+			Program program= new Program(programID,name,quota);
+
+			for (i= split ; i < line.length(); i++) {
+				if (line.charAt(i) == '"') {
+					break;
+				} 
+			}
+			
+			// extracts the resident list
+			rlist= line.substring(i+2,line.length()-2);
+			String delimiter = ","; // Assuming values are separated by commas
+			String[] rol_string = rlist.split(delimiter);
+			rol= new int[rol_string.length];
+			for (int j=0; j<rol_string.length; j++) {
+				
+				rol[j]= Integer.parseInt(rol_string[j]);
+			}
+
+            List<Integer> rols = new ArrayList<>();
+            for(int val : rol){
+                rols.add(val);
             }
-            
-        } catch(IOException e){
-            System.out.println("Error caught: " + e.getMessage());
-        }
-        return programs;
+			
+			program.setRol(rols);
+			
+			programs.put(programID,program);
+
+            br.close();
+		}	
     }
+
+    
+    /** Gale Shapely algorithm
+     * @param residentsFilename
+     * @param programsFilename
+     * @throws IOException
+     * @throws NumberFormatException
+     */
+    public GaleShapley(String residentsFilename, String programsFilename) throws IOException, NumberFormatException {
+		readResidents(residentsFilename);
+		readPrograms(programsFilename);
+
+
+	}
+
+    public static void main(String[] args) {
+		try {
+			
+			GaleShapley gs= new GaleShapley(args[0],args[1]);
+			
+			System.out.println(gs.residents);
+			System.out.println(gs.programs);
+			
+        } catch (Exception e) {
+            System.err.println("Error reading the file: " + e.getMessage());
+        }
+	}
 }

@@ -12,13 +12,15 @@ public class Program {
     private List<Integer> rol;
     private List<Resident> matchedResidents; 
 
-    /** Program constructor with just id and name
+    /** Program constructor with just id and name and quota
      * @param id
      * @param name
+     * @param quota
      */
-    public Program(String id, String name){
+    public Program(String id, String name, int quota){
         this.id = id;
         this.name = name;
+        this.quota = quota;
     }
 
     /** Full program constructor
