@@ -146,4 +146,12 @@ public class Program {
     public List<Resident> getMatchedResidents(){ return matchedResidents; }
     /** @param matchedResident */
     public void setMatchedResidents(List<Resident> matchedResidents){ this.matchedResidents = matchedResidents; }
+
+    /** To string method for resident object
+     */
+    @Override
+	public String toString() {
+      
+       return "["+id+"]: "+name+" {"+ quota+ "}" +" ("+rol.size()+")";	  
+	}
 }

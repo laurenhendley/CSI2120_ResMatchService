@@ -109,4 +109,12 @@ class Resident {
     public int getMR(){ return matchedRank; }
     /** @param matchedRank */
     public void setMR(int matchedRank){ this.matchedRank = matchedRank; }
+
+    /** To string method for resident object
+     */
+    @Override
+    public String toString() {
+      
+       return "["+id+"]: "+firstname+" "+ lastname+" ("+rol.size()+")";	  
+	}
 }
