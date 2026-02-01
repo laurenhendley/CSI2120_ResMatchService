@@ -13,7 +13,7 @@ import java.util.List;
  * Note: some programs will not have residents, some residents will not have a program
  *       do not test using 50,000 file - it will take a looooooooong time
  * 
- * @author Lauren Hendley [lhend093@uottawa.ca], []
+ * @author Lauren Hendley [lhend093@uottawa.ca], Acadia Marchand [amarc139@uottawa.ca]
  */
 public class GaleShapley {
     // Instatiating variables
@@ -98,8 +98,8 @@ public class GaleShapley {
 			
 			residents.put(residentID,resident);
 
-            br.close();
-		}	
+		}
+		br.close();
     }
 
     /** Reads the programs from the csv file
@@ -187,14 +187,89 @@ public class GaleShapley {
             }
 			
 			program.setRol(rols);
+
+			program.setMatchedResidents(new ArrayList<>()); // initializing matched residents list
 			
 			programs.put(programID,program);
 
-            br.close();
-		}	
+		}
+		br.close();
     }
 
-    
+	/** Matches residents to programs using Gale Shapley algorithm
+	 * 
+	 */
+		public void matchResidents(){
+		
+			for (Program program : programs.values()){
+				program.setMatchedResidents(new ArrayList<>()); // gives each program an empty matched residents list
+			}
+
+			HashMap<Integer, Integer> currentChoice = new HashMap<>(); //keeps track of which program each resident will propose to next
+			for (Resident resident : residents.values()) {
+				currentChoice.put(resident.getId(), 0); // initialize proposal index for each resident
+			}
+
+			boolean matched = false; //flag to indicate if all residents are matched
+
+			while (!matched){ //While the resident have been matched or can't be matched (this is the main loop of the algorithm)
+				matched = true;
+
+				for (Resident resident : residents.values()){ //iterate through each resident
+
+					if (resident.getMP() == null){ //if the resident is not yet matched
+						
+						int choice = currentChoice.get(resident.getId()); //get the index of the program to propose
+						
+						if (choice < resident.getRol().size()){
+							matched = false; //if the resident still has programs to be matched with
+
+							String programID = resident.getRol().get(choice);
+							Program program = programs.get(programID);
+
+							currentChoice.put(resident.getId(), choice + 1); //moves to the next choice
+
+							if (program != null){
+								int residentRank = -1; //if the program exist it sets the resident rank to -1 because it hasn't been found yet
+
+								for (int i = 0; i < program.getRol().size(); i++){ //finds the rank of the resident in the program ROL
+									if (program.getRol().get(i) == resident.getId()){
+										residentRank = i;
+										break;
+									}
+								}
+
+								if (residentRank != -1){ //if the resident is in the program ROL
+									
+									if (program.getMatchedResidents().size() < program.getQuota()){ //makes sure the program has spots left and adds the resident if there is
+										resident.setMP(program);
+										resident.setMR(residentRank);
+										program.getMatchedResidents().add(resident);
+									}
+									else{
+										Resident leastPreffered = program.leastPreferred(); //get the least preferred resident currently matched
+
+										if (residentRank < leastPreffered.getMR()){
+											program.getMatchedResidents().remove(leastPreffered); //removes the least preferred resident
+											leastPreffered.setMP(null); //unmatches the least preferred resident
+											leastPreffered.setMR(-1);
+
+											resident.setMP(program);
+											resident.setMR(residentRank);
+											program.getMatchedResidents().add(resident);
+										}
+									}
+								}
+							}
+						}
+
+					}
+				}
+			}
+
+	}
+
+
     /** Gale Shapely algorithm
      * @param residentsFilename
      * @param programsFilename
@@ -204,17 +279,50 @@ public class GaleShapley {
     public GaleShapley(String residentsFilename, String programsFilename) throws IOException, NumberFormatException {
 		readResidents(residentsFilename);
 		readPrograms(programsFilename);
-
-
 	}
 
     public static void main(String[] args) {
 		try {
 			
-			GaleShapley gs= new GaleShapley(args[0],args[1]);
+			GaleShapley gs = new GaleShapley(args[0], args[1]);
+
+			gs.matchResidents();
+
 			
-			System.out.println(gs.residents);
-			System.out.println(gs.programs);
+			//Formatting for the output
+			System.out.println("lastname, firstname, residentID, programID, name");
+			for (Resident residents : gs.residents.values()){
+				String programID;
+				String programName;
+
+				if (residents.getMP() != null){
+					programID = residents.getMP().getID();
+					programName = residents.getMP().getName();
+
+					System.out.println(residents.getLastName() + "," + residents.getFirstName() + "," + residents.getId() + "," + programID + "," + programName);
+				}
+				else{
+					programID = "XXX";
+					programName = "NOT_MATCHED";
+					System.out.println(residents.getLastName() + "," + residents.getFirstName() + "," + residents.getId() + "," + programID + "," + programName);
+				}
+			}
+
+			//Calculating the unmatched residents and available spots based on the matches and outputs the results.
+			int notMatched = 0;
+			for (Resident resident : gs.residents.values()){
+				if (resident.getMP() == null){
+					notMatched++;
+				}
+			}
+			int availableSpots = 0;
+			for (Program program : gs.programs.values()){
+				availableSpots += program.getQuota() - program.getMatchedResidents().size();
+			}
+
+			System.out.println("\nNumber of unmatched residents: " + notMatched);
+			System.out.println("Number of available spots in programs: " + availableSpots);
+			
 			
         } catch (Exception e) {
             System.err.println("Error reading the file: " + e.getMessage());

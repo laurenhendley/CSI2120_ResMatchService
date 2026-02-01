@@ -2,7 +2,7 @@
 import java.util.List;
 
 /** Basic Resident class for CSI2120 project
- * @author Lauren Hendley [lhend093@uottawa.ca], []
+ * @author Lauren Hendley [lhend093@uottawa.ca], Acadia Marchand [amarc139@uottawa.ca]
  */
 class Resident {
     // Instatiating variables
