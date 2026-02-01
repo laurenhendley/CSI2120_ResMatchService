@@ -2,7 +2,8 @@
 import java.util.List;
 
 /** Basic Program class for CSI2120 project
- * @author Lauren Hendley [lhend093@uottawa.ca], Acadia Marchand [amarc139@uottawa.ca]
+ * @author Lauren Hendley [lhend093@uottawa.ca, 300405588]
+ * @author Acadia Marchand [amarc139@uottawa.ca, ]
  */
 public class Program {
     // Instatiating variables

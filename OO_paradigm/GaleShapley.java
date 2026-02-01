@@ -13,7 +13,8 @@ import java.util.List;
  * Note: some programs will not have residents, some residents will not have a program
  *       do not test using 50,000 file - it will take a looooooooong time
  * 
- * @author Lauren Hendley [lhend093@uottawa.ca], Acadia Marchand [amarc139@uottawa.ca]
+ * @author Lauren Hendley [lhend093@uottawa.ca, 300405588]
+ * @author Acadia Marchand [amarc139@uottawa.ca, ]
  */
 public class GaleShapley {
     // Instatiating variables
@@ -199,78 +200,76 @@ public class GaleShapley {
 	/** Matches residents to programs using Gale Shapley algorithm
 	 * 
 	 */
-		public void matchResidents(){
-		
-			for (Program program : programs.values()){
-				program.setMatchedResidents(new ArrayList<>()); // gives each program an empty matched residents list
-			}
+	public void matchResidents(){
+		for (Program program : programs.values()){
+			program.setMatchedResidents(new ArrayList<>()); // gives each program an empty matched residents list
+		}
 
-			HashMap<Integer, Integer> currentChoice = new HashMap<>(); //keeps track of which program each resident will propose to next
-			for (Resident resident : residents.values()) {
-				currentChoice.put(resident.getId(), 0); // initialize proposal index for each resident
-			}
+		HashMap<Integer, Integer> currentChoice = new HashMap<>(); //keeps track of which program each resident will propose to next
+		for (Resident resident : residents.values()) {
+			currentChoice.put(resident.getId(), 0); // initialize proposal index for each resident
+		}
 
-			boolean matched = false; //flag to indicate if all residents are matched
+		boolean matched = false; //flag to indicate if all residents are matched
 
-			while (!matched){ //While the resident have been matched or can't be matched (this is the main loop of the algorithm)
-				matched = true;
+		while (!matched){ //While the resident have been matched or can't be matched (this is the main loop of the algorithm)
+			matched = true;
 
-				for (Resident resident : residents.values()){ //iterate through each resident
+			for (Resident resident : residents.values()){ //iterate through each resident
 
-					if (resident.getMP() == null){ //if the resident is not yet matched
-						
-						int choice = currentChoice.get(resident.getId()); //get the index of the program to propose
-						
-						if (choice < resident.getRol().size()){
-							matched = false; //if the resident still has programs to be matched with
+				if (resident.getMP() == null){ //if the resident is not yet matched
+					
+					int choice = currentChoice.get(resident.getId()); //get the index of the program to propose
+					
+					if (choice < resident.getRol().size()){
+						matched = false; //if the resident still has programs to be matched with
 
-							String programID = resident.getRol().get(choice);
-							Program program = programs.get(programID);
+						String programID = resident.getRol().get(choice);
+						Program program = programs.get(programID);
 
-							currentChoice.put(resident.getId(), choice + 1); //moves to the next choice
+						currentChoice.put(resident.getId(), choice + 1); //moves to the next choice
 
-							if (program != null){
-								int residentRank = -1; //if the program exist it sets the resident rank to -1 because it hasn't been found yet
+						if (program != null){
+							int residentRank = -1; //if the program exist it sets the resident rank to -1 because it hasn't been found yet
 
-								for (int i = 0; i < program.getRol().size(); i++){ //finds the rank of the resident in the program ROL
-									if (program.getRol().get(i) == resident.getId()){
-										residentRank = i;
-										break;
-									}
+							for (int i = 0; i < program.getRol().size(); i++){ //finds the rank of the resident in the program ROL
+								if (program.getRol().get(i) == resident.getId()){
+									residentRank = i;
+									break;
 								}
+							}
 
-								if (residentRank != -1){ //if the resident is in the program ROL
-									
-									if (program.getMatchedResidents().size() < program.getQuota()){ //makes sure the program has spots left and adds the resident if there is
+							if (residentRank != -1){ //if the resident is in the program ROL
+								
+								if (program.getMatchedResidents().size() < program.getQuota()){ //makes sure the program has spots left and adds the resident if there is
+									resident.setMP(program);
+									resident.setMR(residentRank);
+									program.getMatchedResidents().add(resident);
+								}
+								else{
+									Resident leastPreffered = program.leastPreferred(); //get the least preferred resident currently matched
+
+									if (residentRank < leastPreffered.getMR()){
+										program.getMatchedResidents().remove(leastPreffered); //removes the least preferred resident
+										leastPreffered.setMP(null); //unmatches the least preferred resident
+										leastPreffered.setMR(-1);
+
 										resident.setMP(program);
 										resident.setMR(residentRank);
 										program.getMatchedResidents().add(resident);
 									}
-									else{
-										Resident leastPreffered = program.leastPreferred(); //get the least preferred resident currently matched
-
-										if (residentRank < leastPreffered.getMR()){
-											program.getMatchedResidents().remove(leastPreffered); //removes the least preferred resident
-											leastPreffered.setMP(null); //unmatches the least preferred resident
-											leastPreffered.setMR(-1);
-
-											resident.setMP(program);
-											resident.setMR(residentRank);
-											program.getMatchedResidents().add(resident);
-										}
-									}
 								}
 							}
 						}
-
 					}
+
 				}
 			}
-
+		}
 	}
 
 
-    /** Gale Shapely algorithm
+    /** Gale Shapley algorithm
      * @param residentsFilename
      * @param programsFilename
      * @throws IOException
@@ -281,6 +280,10 @@ public class GaleShapley {
 		readPrograms(programsFilename);
 	}
 
+
+	/** Main method
+	 * @param args
+	 */
     public static void main(String[] args) {
 		try {
 			
