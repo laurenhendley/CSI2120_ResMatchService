@@ -21,11 +21,11 @@ type Resident struct {
 
 // The Program data type
 type Program struct {
-	programID  string
-	name       string
-	nPositions int   // number of positions available (quota)
-	rol        []int // program rank order list
-	// TO ADD: a data structure for the selected resident IDs
+	programID        string
+	name             string
+	nPositions       int   // number of positions available (quota)
+	rol              []int // program rank order list
+	matchedResidents []int // TO ADD: a data structure for the selected resident IDs
 }
 
 // Parse a resident's ROL
@@ -169,6 +169,7 @@ func main() {
 	}
 
 	for _, p := range residents {
+		p.matchedProgram = ""
 		fmt.Printf("ID: %d, Name: %s %s, Rol: %v\n", p.residentID, p.firstname, p.lastname, p.rol)
 	}
 
@@ -179,6 +180,7 @@ func main() {
 	}
 
 	for _, p := range programs {
+		p.matchedResidents = nil
 		fmt.Printf("ID: %s, Name: %s, Number of pos: %d, Number of applicants: %d\n", p.programID, p.name, p.nPositions, len(p.rol))
 	}
 
