@@ -6,7 +6,8 @@ Github repo for the project: https://github.com/laurenhendley/CSI2120_ResMatchSe
 
 
 References:
-- None
+- Geeks for Geeks: Stable Marriage Problem - https://www.geeksforgeeks.org/dsa/stable-marriage-problem/
+- Sanfoundry: Java Program to Implement Gale Shapley Algorithm - https://www.sanfoundry.com/java-program-gale-shapley-algorithm/
 
 Outputs:
 [SMALL FILES]
