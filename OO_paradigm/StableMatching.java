@@ -10,7 +10,7 @@ import java.util.List;
 /** Stable matching main file
  * 
  * @author Lauren Hendley [lhend093@uottawa.ca, 300405588]
- * @author Acadia Marchand [amarc139@uottawa.ca, ]
+ * @author Acadia Marchand [amarc139@uottawa.ca, 300340641]
  */
 public class StableMatching {
 	/** Main method
