@@ -43,12 +43,13 @@ func least_preferred(p *Program) int {
 }
 
 func remove(slice []int, val int) []int {
-	for i, v := range slice {
-		if v == val {
-			return append(slice[:i], slice[i+1:]...)
+	res := make([]int, 0, len(slice)-1)
+	for _, v := range slice {
+		if v != val {
+			res = append(res, v)
 		}
 	}
-	return slice
+	return res
 }
 
 func evaluate(rid int, pid string, residents map[int]*Resident, programs map[string]*Program) {
@@ -64,18 +65,26 @@ func evaluate(rid int, pid string, residents map[int]*Resident, programs map[str
 		log.Fatal("Error getting program")
 	}
 
-	least_pref := least_preferred(p)
+	if slices.Index(p.rol, rid) == -1 {
+		r.rol = r.rol[1:]
+		offer(rid, residents, programs)
+		return
+	}
 
-	if len(r.rol) == 0 {
-		offer(rid, residents, programs)
-	} else if len(p.matchedResidents) < p.nPositions {
+	if len(p.matchedResidents) < p.nPositions {
 		r.matchedProgram = pid
 		p.matchedResidents = append(p.matchedResidents, rid)
-	} else if slices.Index(p.rol, rid) < slices.Index(p.rol, least_pref) {
-		p.matchedResidents = remove(p.matchedResidents, least_pref)
-		p.matchedResidents = append(p.matchedResidents, rid)
-		r.matchedProgram = pid
 	} else {
-		offer(rid, residents, programs)
+		least_pref := least_preferred(p)
+		if slices.Index(p.rol, rid) < slices.Index(p.rol, least_pref) {
+			p.matchedResidents = remove(p.matchedResidents, least_pref)
+			p.matchedResidents = append(p.matchedResidents, rid)
+			r.matchedProgram = pid
+			residents[least_pref].matchedProgram = ""
+			offer(least_pref, residents, programs)
+		} else {
+			r.rol = r.rol[1:]
+			offer(rid, residents, programs)
+		}
 	}
 }

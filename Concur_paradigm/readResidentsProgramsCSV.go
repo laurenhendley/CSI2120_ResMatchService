@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -162,18 +161,13 @@ func ReadProgramsCSV(filename string) (map[string]*Program, error) {
 func main() {
 
 	// read residents
-	residents, err := ReadResidentsCSV("residents4000.csv")
+	residents, err := ReadResidentsCSV("residentSmall.csv")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 
-	for _, p := range residents {
-		p.matchedProgram = ""
-		fmt.Printf("ID: %d, Name: %s %s, Rol: %v\n", p.residentID, p.firstname, p.lastname, p.rol)
-	}
-
-	programs, err := ReadProgramsCSV("programs4000.csv")
+	programs, err := ReadProgramsCSV("programSmall.csv")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
@@ -184,19 +178,21 @@ func main() {
 		fmt.Printf("ID: %s, Name: %s, Number of pos: %d, Number of applicants: %d\n", p.programID, p.name, p.nPositions, len(p.rol))
 	}
 
+	for _, p := range residents {
+		p.matchedProgram = ""
+		fmt.Printf("ID: %d, Name: %s %s, Rol: %v\n", p.residentID, p.firstname, p.lastname, p.rol)
+	}
+
 	fmt.Printf("\nNMD: %v", programs["NMD"])
 
 	start := time.Now() // chrono
-	var wg sync.WaitGroup
 
 	// try to match each resident
 	for id := range residents {
 
-		go offer(id, residents, programs)
+		offer(id, residents, programs)
 
 	}
-
-	wg.Wait()
 
 	end := time.Now() // chrono
 
