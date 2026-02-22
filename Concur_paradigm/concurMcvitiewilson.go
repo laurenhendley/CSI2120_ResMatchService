@@ -4,13 +4,20 @@ package main
 import (
 	"log"
 	"slices"
+	"sync"
 )
 
 // Function to offer coures to the residents
-func offer(rid int, residents map[int]*Resident, programs map[string]*Program) {
+func ConcurOffer(rid int, residents map[int]*Resident, programs map[string]*Program, wg *sync.WaitGroup, mu *sync.Mutex) {
+	// Defer completion
+	defer wg.Done()
+
+	mu.Lock()
+
 	// Try to find the resident based on the id, throw error if not found
 	res, ok := residents[rid]
 	if !ok {
+		mu.Unlock()
 		log.Fatal("Resident not found in map")
 	}
 
@@ -26,56 +33,28 @@ func offer(rid int, residents map[int]*Resident, programs map[string]*Program) {
 	// If there's no program, match them with no program, otherwise find a program for them
 	if pid == "" {
 		res.matchedProgram = ""
+		mu.Unlock()
 	} else {
-		evaluate(rid, pid, residents, programs)
+		mu.Unlock()
+		ConcurEvaluate(rid, pid, residents, programs, wg, mu)
 	}
-}
-
-// Find the least preferred resident
-func least_preferred(p *Program) int {
-	// Initialize
-	worst_res := p.matchedResidents[0]
-	worstRank := slices.Index(p.rol, worst_res)
-
-	// For each resident in the matched residents
-	for _, rid := range p.matchedResidents {
-		// Find the rank
-		rank := slices.Index(p.rol, rid)
-		// Replace if it's worse
-		if rank > worstRank {
-			worst_res = rid
-			worstRank = rank
-		}
-	}
-
-	return worst_res
-}
-
-// Helper remove function
-func remove(slice []int, val int) []int {
-	// Make the resulting slice
-	res := make([]int, 0, len(slice)-1)
-
-	// Append all values except desired deleted value
-	for _, v := range slice {
-		if v != val {
-			res = append(res, v)
-		}
-	}
-	return res
 }
 
 // Evaluation function
-func evaluate(rid int, pid string, residents map[int]*Resident, programs map[string]*Program) {
+func ConcurEvaluate(rid int, pid string, residents map[int]*Resident, programs map[string]*Program, wg *sync.WaitGroup, mu *sync.Mutex) {
+	mu.Lock()
+
 	// Find resident, throw error if not found
 	r, ok := residents[rid]
 	if !ok {
+		mu.Unlock()
 		log.Fatal("Error getting resident")
 	}
 
 	// Find program, throw error if not found
 	p, ok := programs[pid]
 	if !ok {
+		mu.Unlock()
 		log.Fatal("Error getting program")
 	}
 
@@ -84,8 +63,11 @@ func evaluate(rid int, pid string, residents map[int]*Resident, programs map[str
 
 	// If the program doesn't want the resident
 	if slices.Index(p.rol, rid) == -1 {
+		mu.Unlock()
 		// Try the next program
-		offer(rid, residents, programs)
+		// Add operation to the waitGroup
+		wg.Add(1)
+		go ConcurOffer(rid, residents, programs, wg, mu)
 		return
 	}
 
@@ -94,6 +76,9 @@ func evaluate(rid int, pid string, residents map[int]*Resident, programs map[str
 		// Match the resident
 		r.matchedProgram = pid
 		p.matchedResidents = append(p.matchedResidents, rid)
+
+		mu.Unlock()
+		return
 	} else { // Otherwise, check if its preferred more than someone else
 		least_pref := least_preferred(p)
 
@@ -104,10 +89,17 @@ func evaluate(rid int, pid string, residents map[int]*Resident, programs map[str
 			p.matchedResidents = append(p.matchedResidents, rid)
 			r.matchedProgram = pid
 			residents[least_pref].matchedProgram = ""
-			offer(least_pref, residents, programs)
+
+			// Call offer function concurrently
+			mu.Unlock()
+			wg.Add(1)
+			go ConcurOffer(least_pref, residents, programs, wg, mu)
 		} else {
 			// Otherwise, resident applies to next choice
-			offer(rid, residents, programs)
+			// Call offer function concurrently
+			mu.Unlock()
+			wg.Add(1)
+			go ConcurOffer(rid, residents, programs, wg, mu)
 		}
 	}
 }

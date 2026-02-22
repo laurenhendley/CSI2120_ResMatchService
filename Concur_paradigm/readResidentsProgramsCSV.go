@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -167,17 +168,18 @@ func main() {
 		return
 	}
 
+	// read programs
 	programs, err := ReadProgramsCSV("programSmall.csv")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 
+	// initalize
 	for _, p := range programs {
 		p.matchedResidents = nil
 		fmt.Printf("ID: %s, Name: %s, Number of pos: %d, Number of applicants: %d\n", p.programID, p.name, p.nPositions, len(p.rol))
 	}
-
 	for _, p := range residents {
 		p.matchedProgram = ""
 		fmt.Printf("ID: %d, Name: %s %s, Rol: %v\n", p.residentID, p.firstname, p.lastname, p.rol)
@@ -185,17 +187,35 @@ func main() {
 
 	fmt.Printf("\nNMD: %v", programs["NMD"])
 
+	// SINGLE THREAD
+
 	start := time.Now() // chrono
 
 	// try to match each resident
 	for id := range residents {
-
 		offer(id, residents, programs)
-
 	}
-
 	end := time.Now() // chrono
 
 	// print solution
 	fmt.Printf("\n\nExecution time: %s", end.Sub(start))
+
+	// MULTI-THREAD
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+
+	startConcur := time.Now() // chrono
+
+	// try to match each resident
+	for id := range residents {
+		wg.Add(1)
+		go ConcurOffer(id, residents, programs, &wg, &mu)
+	}
+
+	wg.Wait()
+
+	endConcur := time.Now() // chrono
+
+	// print solution
+	fmt.Printf("\n\nExecution time: %s", endConcur.Sub(startConcur))
 }
