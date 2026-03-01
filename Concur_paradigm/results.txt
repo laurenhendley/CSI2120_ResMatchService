@@ -1,0 +1,74 @@
+##########################################
+# SMALL FILE RESULTS
+##########################################
+
+
+ID: MMI, Name: Microbiology, Number of pos: 1, Number of applicants: 6
+ID: HEP, Name: Hematological Pathology, Number of pos: 2, Number of applicants: 5
+ID: NRS, Name: Neurosurgery, Number of pos: 4, Number of applicants: 6
+ID: OBG, Name: Obstetrics and Gynecology, Number of pos: 3, Number of applicants: 4
+ID: 517, Name: Rosalie Frederick, Rol: [NRS MMI]
+ID: 403, Name: Aspyn Olson, Rol: [HEP NRS]
+ID: 226, Name: Zev Jarvis, Rol: [MMI HEP NRS]
+ID: 126, Name: Indie Medrano, Rol: [MMI NRS]
+ID: 616, Name: Laurent Robert, Rol: [OBG MMI HEP NRS]
+ID: 574, Name: Salvatore Williams, Rol: [NRS HEP MMI]
+ID: 828, Name: Emma Tremmo, Rol: [OBG NRS]
+ID: 913, Name: Camille Paquet, Rol: [OBG MMI HEP]
+ID: 773, Name: Marie Clown, Rol: [OBG]
+ID: 377, Name: Tom Tan, Rol: [MMI OBG]
+
+NMD: <nil>
+
+Starting single thread...
+
+
+Single thread execution time: 5.458µs
+
+Printing single thread results...
+
+Firstname: Rosalie, Lastname: Frederick, Program: NRS
+Firstname: Aspyn, Lastname: Olson, Program: HEP
+Firstname: Zev, Lastname: Jarvis, Program: MMI
+Firstname: Indie, Lastname: Medrano, Program: NRS
+Firstname: Laurent, Lastname: Robert, Program: OBG
+Firstname: Salvatore, Lastname: Williams, Program: NRS
+Firstname: Emma, Lastname: Tremmo, Program: OBG
+Firstname: Camille, Lastname: Paquet, Program: HEP
+Firstname: Marie, Lastname: Clown, Program: OBG
+Firstname: Tom, Lastname: Tan, Program: 
+
+
+Resetting residents and programs...
+
+
+Starting concurrent version...
+
+
+Concurrent execution time: 105.584µs
+
+Printing multi-thread results...
+
+Firstname: Salvatore, Lastname: Williams, Program: NRS
+Firstname: Aspyn, Lastname: Olson, Program: HEP
+Firstname: Indie, Lastname: Medrano, Program: NRS
+Firstname: Camille, Lastname: Paquet, Program: HEP
+Firstname: Rosalie, Lastname: Frederick, Program: NRS
+Firstname: Zev, Lastname: Jarvis, Program: MMI
+Firstname: Emma, Lastname: Tremmo, Program: OBG
+Firstname: Marie, Lastname: Clown, Program: OBG
+Firstname: Laurent, Lastname: Robert, Program: OBG
+Firstname: Tom, Lastname: Tan, Program:
+
+
+##########################################
+# LARGE FILE RESULTS
+##########################################
+
+
+
+
+
+##########################################
+# 4000 FILE RESULTS
+##########################################

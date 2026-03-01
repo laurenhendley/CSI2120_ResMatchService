@@ -162,14 +162,14 @@ func ReadProgramsCSV(filename string) (map[string]*Program, error) {
 func main() {
 
 	// read residents
-	residents, err := ReadResidentsCSV("residentSmall.csv")
+	residents, err := ReadResidentsCSV("residentsLarge.csv")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 
 	// read programs
-	programs, err := ReadProgramsCSV("programSmall.csv")
+	programs, err := ReadProgramsCSV("programsLarge.csv")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
@@ -178,14 +178,16 @@ func main() {
 	// initalize
 	for _, p := range programs {
 		p.matchedResidents = nil
-		fmt.Printf("ID: %s, Name: %s, Number of pos: %d, Number of applicants: %d\n", p.programID, p.name, p.nPositions, len(p.rol))
+		//fmt.Printf("ID: %s, Name: %s, Number of pos: %d, Number of applicants: %d\n", p.programID, p.name, p.nPositions, len(p.rol))
 	}
 	for _, p := range residents {
 		p.matchedProgram = ""
-		fmt.Printf("ID: %d, Name: %s %s, Rol: %v\n", p.residentID, p.firstname, p.lastname, p.rol)
+		//fmt.Printf("ID: %d, Name: %s %s, Rol: %v\n", p.residentID, p.firstname, p.lastname, p.rol)
 	}
 
-	fmt.Printf("\nNMD: %v", programs["NMD"])
+	//fmt.Printf("\nNMD: %v", programs["NMD"])
+
+	fmt.Println("\n\nStarting single thread...")
 
 	// SINGLE THREAD
 
@@ -197,8 +199,24 @@ func main() {
 	}
 	end := time.Now() // chrono
 
-	// print solution
-	fmt.Printf("\n\nExecution time: %s", end.Sub(start))
+	// print time
+	fmt.Printf("\n\nSingle thread execution time: %s", end.Sub(start))
+
+	fmt.Printf("\n\nPrinting single thread results...\n\n")
+	for _, r := range residents {
+		fmt.Print("Firstname: ", r.firstname)
+		fmt.Print(", Lastname: ", r.lastname)
+		fmt.Print(", Program: ", r.matchedProgram)
+		fmt.Println()
+	}
+
+	fmt.Println("\n\nResetting residents and programs...")
+	// Reset residents/programs:
+
+	residents, _ = ReadResidentsCSV("residentSmall.csv")
+	programs, _ = ReadProgramsCSV("programSmall.csv")
+
+	fmt.Println("\n\nStarting concurrent version...")
 
 	// MULTI-THREAD
 	var mu sync.Mutex
@@ -217,5 +235,12 @@ func main() {
 	endConcur := time.Now() // chrono
 
 	// print solution
-	fmt.Printf("\n\nExecution time: %s", endConcur.Sub(startConcur))
+	fmt.Printf("\n\nConcurrent execution time: %s", endConcur.Sub(startConcur))
+	fmt.Printf("\n\nPrinting multi-thread results...\n\n")
+	for _, r := range residents {
+		fmt.Print("Firstname: ", r.firstname)
+		fmt.Print(", Lastname: ", r.lastname)
+		fmt.Print(", Program: ", r.matchedProgram)
+		fmt.Println()
+	}
 }
