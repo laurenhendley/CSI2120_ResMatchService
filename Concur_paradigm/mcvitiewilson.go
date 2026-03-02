@@ -8,26 +8,60 @@ import (
 
 // Function to offer coures to the residents
 func offer(rid int, residents map[int]*Resident, programs map[string]*Program) {
-	// Try to find the resident based on the id, throw error if not found
-	res, ok := residents[rid]
-	if !ok {
-		log.Fatal("Resident not found in map")
-	}
+	allRids := []int{rid}
 
-	// Find the program id in the 'rol' of the resident
-	pid := ""
-	for _, p := range res.rol {
-		if _, ok := programs[p]; ok {
-			pid = p
-			break
+	for len(allRids) > 0 {
+		cur_rid := allRids[0]
+		allRids = allRids[1:]
+
+		// Try to find the resident based on the id, throw error if not found
+		res, ok := residents[cur_rid]
+		if !ok {
+			log.Fatal("Resident not found in map")
 		}
-	}
 
-	// If there's no program, match them with no program, otherwise find a program for them
-	if pid == "" {
-		res.matchedProgram = ""
-	} else {
-		evaluate(rid, pid, residents, programs)
+		match := false
+		for len(res.rol) > 0 {
+			pid := res.rol[0]
+			res.rol = res.rol[1:]
+
+			// Find the program id in the 'rol' of the resident
+			p, ok := programs[pid]
+			for !ok {
+				continue
+			}
+			// If the program doesn't want the resident
+			if slices.Index(p.rol, rid) == -1 {
+				// Try the next program
+				continue
+			}
+
+			// If there is still room for matched residents
+			if len(p.matchedResidents) < p.nPositions {
+				// Match the resident
+				match = true
+				res.matchedProgram = pid
+				p.matchedResidents = append(p.matchedResidents, rid)
+				break
+			}
+
+			least_pref := least_preferred(p)
+			// Check if the new resident is ranked higher than worst
+			if slices.Index(p.rol, rid) < slices.Index(p.rol, least_pref) {
+				// Then replace them (remove worst resident)
+				p.matchedResidents = remove(p.matchedResidents, least_pref)
+				p.matchedResidents = append(p.matchedResidents, rid)
+				res.matchedProgram = pid
+				residents[least_pref].matchedProgram = ""
+				allRids = append(allRids, least_pref)
+				match = true
+				break
+			}
+		}
+		// If there's no program, match them with no program, otherwise find a program for them
+		if !match {
+			res.matchedProgram = ""
+		}
 	}
 }
 
@@ -65,6 +99,7 @@ func remove(slice []int, val int) []int {
 	return res
 }
 
+/*
 // Evaluation function
 func evaluate(rid int, pid string, residents map[int]*Resident, programs map[string]*Program) {
 	// Find resident, throw error if not found
@@ -111,3 +146,4 @@ func evaluate(rid int, pid string, residents map[int]*Resident, programs map[str
 		}
 	}
 }
+*/

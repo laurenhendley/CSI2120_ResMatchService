@@ -186,36 +186,37 @@ func main() {
 	}
 
 	//fmt.Printf("\nNMD: %v", programs["NMD"])
+	/*
+		fmt.Println("\n\nStarting single thread...")
 
-	fmt.Println("\n\nStarting single thread...")
+		// SINGLE THREAD
 
-	// SINGLE THREAD
+		start := time.Now() // chrono
 
-	start := time.Now() // chrono
+		// try to match each resident
+		for id := range residents {
+			offer(id, residents, programs)
+		}
+		end := time.Now() // chrono
 
-	// try to match each resident
-	for id := range residents {
-		offer(id, residents, programs)
-	}
-	end := time.Now() // chrono
 
-	// print time
-	fmt.Printf("\n\nSingle thread execution time: %s", end.Sub(start))
+			// print time
+			fmt.Printf("\n\nSingle thread execution time: %s", end.Sub(start))
 
-	fmt.Printf("\n\nPrinting single thread results...\n\n")
-	for _, r := range residents {
-		fmt.Print("Firstname: ", r.firstname)
-		fmt.Print(", Lastname: ", r.lastname)
-		fmt.Print(", Program: ", r.matchedProgram)
-		fmt.Println()
-	}
+			fmt.Printf("\n\nPrinting single thread results...\n\n")
+			for _, r := range residents {
+				fmt.Print("Firstname: ", r.firstname)
+				fmt.Print(", Lastname: ", r.lastname)
+				fmt.Print(", Program: ", r.matchedProgram)
+				fmt.Println()
+			}
 
-	fmt.Println("\n\nResetting residents and programs...")
-	// Reset residents/programs:
+			fmt.Println("\n\nResetting residents and programs...")
+			// Reset residents/programs:
 
-	residents, _ = ReadResidentsCSV("residentSmall.csv")
-	programs, _ = ReadProgramsCSV("programSmall.csv")
-
+			residents, _ = ReadResidentsCSV("residentSmall.csv")
+			programs, _ = ReadProgramsCSV("programSmall.csv")
+	*/
 	fmt.Println("\n\nStarting concurrent version...")
 
 	// MULTI-THREAD

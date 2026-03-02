@@ -2,8 +2,6 @@ package main
 
 // Imported packages
 import (
-	"log"
-	"slices"
 	"sync"
 )
 
@@ -11,35 +9,12 @@ import (
 func ConcurOffer(rid int, residents map[int]*Resident, programs map[string]*Program, wg *sync.WaitGroup, mu *sync.Mutex) {
 	// Defer completion
 	defer wg.Done()
-
 	mu.Lock()
-
-	// Try to find the resident based on the id, throw error if not found
-	res, ok := residents[rid]
-	if !ok {
-		mu.Unlock()
-		log.Fatal("Resident not found in map")
-	}
-
-	// Find the program id in the 'rol' of the resident
-	pid := ""
-	for _, p := range res.rol {
-		if _, ok := programs[p]; ok {
-			pid = p
-			break
-		}
-	}
-
-	// If there's no program, match them with no program, otherwise find a program for them
-	if pid == "" {
-		res.matchedProgram = ""
-		mu.Unlock()
-	} else {
-		mu.Unlock()
-		ConcurEvaluate(rid, pid, residents, programs, wg, mu)
-	}
+	defer mu.Unlock()
+	offer(rid, residents, programs)
 }
 
+/*
 // Evaluation function
 func ConcurEvaluate(rid int, pid string, residents map[int]*Resident, programs map[string]*Program, wg *sync.WaitGroup, mu *sync.Mutex) {
 	mu.Lock()
@@ -103,3 +78,4 @@ func ConcurEvaluate(rid int, pid string, residents map[int]*Resident, programs m
 		}
 	}
 }
+*/
