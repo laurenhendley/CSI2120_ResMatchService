@@ -2,6 +2,7 @@ package main
 
 // Imported packages
 import (
+	"log"
 	"sync"
 )
 
@@ -9,73 +10,89 @@ import (
 func ConcurOffer(rid int, residents map[int]*Resident, programs map[string]*Program, wg *sync.WaitGroup, mu *sync.Mutex) {
 	// Defer completion
 	defer wg.Done()
-	mu.Lock()
-	defer mu.Unlock()
-	offer(rid, residents, programs)
+
+	ConcurEvaluate(rid, residents, programs, wg, mu)
 }
 
-/*
 // Evaluation function
-func ConcurEvaluate(rid int, pid string, residents map[int]*Resident, programs map[string]*Program, wg *sync.WaitGroup, mu *sync.Mutex) {
-	mu.Lock()
+func ConcurEvaluate(rid int, residents map[int]*Resident, programs map[string]*Program, wg *sync.WaitGroup, mu *sync.Mutex) {
+	allRids := []int{rid}
 
-	// Find resident, throw error if not found
-	r, ok := residents[rid]
-	if !ok {
-		mu.Unlock()
-		log.Fatal("Error getting resident")
-	}
+	for len(allRids) > 0 {
+		cur_rid := allRids[0]
+		allRids = allRids[1:]
 
-	// Find program, throw error if not found
-	p, ok := programs[pid]
-	if !ok {
-		mu.Unlock()
-		log.Fatal("Error getting program")
-	}
+		// Try to find the resident based on the id, throw error if not found
+		res, ok := residents[cur_rid]
+		if !ok {
+			log.Fatal("Resident not found in map")
+		}
 
-	// Skip current program
-	r.rol = r.rol[1:]
+		match := false
+		for len(res.rol) > 0 {
+			pid := res.rol[0]
+			res.rol = res.rol[1:]
 
-	// If the program doesn't want the resident
-	if slices.Index(p.rol, rid) == -1 {
-		mu.Unlock()
-		// Try the next program
-		// Add operation to the waitGroup
-		wg.Add(1)
-		go ConcurOffer(rid, residents, programs, wg, mu)
-		return
-	}
+			// Find the program id in the 'rol' of the resident
+			p, ok := programs[pid]
+			if !ok {
+				log.Fatal("Program not found")
+			}
 
-	// If there is still room for matched residents
-	if len(p.matchedResidents) < p.nPositions {
-		// Match the resident
-		r.matchedProgram = pid
-		p.matchedResidents = append(p.matchedResidents, rid)
+			// If the program doesn't want the resident
+			wants := false
+			for _, res := range p.rol {
+				if res == rid {
+					wants = true
+					break
+				}
+			}
 
-		mu.Unlock()
-		return
-	} else { // Otherwise, check if its preferred more than someone else
-		least_pref := least_preferred(p)
+			if !wants {
+				continue
+			}
 
-		// Check if the new resident is ranked higher than worst
-		if slices.Index(p.rol, rid) < slices.Index(p.rol, least_pref) {
-			// Then replace them (remove worst resident)
-			p.matchedResidents = remove(p.matchedResidents, least_pref)
-			p.matchedResidents = append(p.matchedResidents, rid)
-			r.matchedProgram = pid
-			residents[least_pref].matchedProgram = ""
+			mu.Lock()
+			// If there is still room for matched residents
+			if len(p.matchedResidents) < p.nPositions {
+				// Match the resident
+				match = true
+				res.matchedProgram = pid
+				p.matchedResidents = append(p.matchedResidents, rid)
+				mu.Unlock()
+				break
+			}
 
-			// Call offer function concurrently
+			least_pref := least_preferred(p)
+			// Check if the new resident is ranked higher than worst
+			rankRid := -1
+			rankLeastPref := -1
+
+			for i, j := range p.rol {
+				if j == rid {
+					rankRid = i
+				}
+				if j == least_pref {
+					rankLeastPref = i
+				}
+			}
+
+			if rankRid != -1 && rankLeastPref != -1 && rankRid < rankLeastPref {
+				// Then replace them (remove worst resident)
+				p.matchedResidents = remove(p.matchedResidents, least_pref)
+				p.matchedResidents = append(p.matchedResidents, rid)
+				res.matchedProgram = pid
+				residents[least_pref].matchedProgram = ""
+				allRids = append(allRids, least_pref)
+				mu.Unlock()
+				match = true
+				break
+			}
 			mu.Unlock()
-			wg.Add(1)
-			go ConcurOffer(least_pref, residents, programs, wg, mu)
-		} else {
-			// Otherwise, resident applies to next choice
-			// Call offer function concurrently
-			mu.Unlock()
-			wg.Add(1)
-			go ConcurOffer(rid, residents, programs, wg, mu)
+		}
+		// If there's no program, match them with no program, otherwise find a program for them
+		if !match {
+			res.matchedProgram = ""
 		}
 	}
 }
-*/

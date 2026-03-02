@@ -3,7 +3,6 @@ package main
 // Imported packages
 import (
 	"log"
-	"slices"
 )
 
 // Function to offer coures to the residents
@@ -27,12 +26,20 @@ func offer(rid int, residents map[int]*Resident, programs map[string]*Program) {
 
 			// Find the program id in the 'rol' of the resident
 			p, ok := programs[pid]
-			for !ok {
-				continue
+			if !ok {
+				log.Fatal("Program not found")
 			}
+
 			// If the program doesn't want the resident
-			if slices.Index(p.rol, rid) == -1 {
-				// Try the next program
+			wants := false
+			for _, res := range p.rol {
+				if res == rid {
+					wants = true
+					break
+				}
+			}
+
+			if !wants {
 				continue
 			}
 
@@ -47,7 +54,20 @@ func offer(rid int, residents map[int]*Resident, programs map[string]*Program) {
 
 			least_pref := least_preferred(p)
 			// Check if the new resident is ranked higher than worst
-			if slices.Index(p.rol, rid) < slices.Index(p.rol, least_pref) {
+
+			rankRid := -1
+			rankLeastPref := -1
+
+			for i, j := range p.rol {
+				if j == rid {
+					rankRid = i
+				}
+				if j == least_pref {
+					rankLeastPref = i
+				}
+			}
+
+			if rankRid != -1 && rankLeastPref != -1 && rankRid < rankLeastPref {
 				// Then replace them (remove worst resident)
 				p.matchedResidents = remove(p.matchedResidents, least_pref)
 				p.matchedResidents = append(p.matchedResidents, rid)
@@ -69,12 +89,24 @@ func offer(rid int, residents map[int]*Resident, programs map[string]*Program) {
 func least_preferred(p *Program) int {
 	// Initialize
 	worst_res := p.matchedResidents[0]
-	worstRank := slices.Index(p.rol, worst_res)
+	worstRank := -1
+	for i, v := range p.rol {
+		if v == worst_res {
+			worstRank = i
+			break
+		}
+	}
 
 	// For each resident in the matched residents
 	for _, rid := range p.matchedResidents {
 		// Find the rank
-		rank := slices.Index(p.rol, rid)
+		rank := -1
+		for i, v := range p.rol {
+			if v == rid {
+				rank = i
+				break
+			}
+		}
 		// Replace if it's worse
 		if rank > worstRank {
 			worst_res = rid
