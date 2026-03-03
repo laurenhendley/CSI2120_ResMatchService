@@ -1,0 +1,45 @@
+Students:
+Lauren Hendley [lhend093@uottawa.ca, SN: 300405588]
+Acadia Marchand [amarc139@uottawa.ca, SN: 300340641]
+
+##########################################
+# 4000 FILE RESULTS
+##########################################
+
+
+Starting single thread...
+
+
+Single thread execution time: 886.013083ms
+
+Printing single thread results...
+
+Firstname: Robin, Lastname: Reeves, Program: FMD
+Firstname: Aileen, Lastname: Gordon, Program: IMD
+Firstname: Khalil, Lastname: Galvan, Program: PDT
+Firstname: Maddison, Lastname: Moore, Program: 
+....
+Firstname: Roy, Lastname: Moyer, Program: DRA
+Firstname: Crew, Lastname: Norris, Program: FMD
+Firstname: Diego, Lastname: Jacobs, Program: IMD
+Firstname: Athena, Lastname: Sanchez, Program: FMD
+
+
+Resetting residents and programs...
+
+
+Starting concurrent version...
+
+
+Concurrent execution time: 1.007782334s
+
+Printing multi-thread results...
+
+Firstname: Maci, Lastname: Farrell, Program: FMD
+Firstname: Vivienne, Lastname: Huff, Program: 
+Firstname: Axton, Lastname: Cano, Program: URO
+Firstname: Dakota, Lastname: Dorsey, Program: IMD
+....
+Firstname: Angie, Lastname: Daniel, Program: 
+Firstname: Brixton, Lastname: Berg, Program: IMD
+Firstname: Zain, Lastname: Mercado, Program: FMD

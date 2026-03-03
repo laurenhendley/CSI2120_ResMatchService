@@ -1,0 +1,28 @@
+Students:
+Lauren Hendley [lhend093@uottawa.ca, SN: 300405588]
+Acadia Marchand [amarc139@uottawa.ca, SN: 300340641]
+
+##########################################
+# LARGE FILE RESULTS
+##########################################
+
+(Note: With the large file, the single-threaded version never finished)
+
+
+
+Starting concurrent version...
+
+
+Concurrent execution time: 1.044770583s
+
+Printing multi-thread results...
+
+Firstname: Lennon, Lastname: Garrett, Program: IMD
+Firstname: Raegan, Lastname: Chavez, Program: ANT
+Firstname: Nolan, Lastname: Gaines, Program: IMD
+Firstname: Matilda, Lastname: Estrada, Program: 
+....
+Firstname: Piper, Lastname: Dixon, Program: PDT
+Firstname: Iyla, Lastname: Harvey, Program: FMD
+Firstname: Diego, Lastname: Jacobs, Program: IMD
+Firstname: Colt, Lastname: Sanchez, Program: FMD

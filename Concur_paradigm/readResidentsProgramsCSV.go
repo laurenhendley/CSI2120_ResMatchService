@@ -1,3 +1,7 @@
+//Students:
+//Lauren Hendley [lhend093@uottawa.ca, SN: 300405588]
+//Acadia Marchand [amarc139@uottawa.ca, SN: 300340641]
+
 package main
 
 import (
