@@ -21,3 +21,32 @@ leastPreferred(PID, [H|T], LPR, RR):-
     ;
         LPR = TID,
         RR = TRank).
+
+% matched(ResidentID, ProgramID, MatchSet) - identifies resident has
+% been matched
+matched(RID,PID,[match(PID,Residents)| _]) :-
+    member(RID,Residents), !.
+matched(RID,PID,[_| T]) :-
+    matched(RID,PID,T).
+
+add(RID,PID,[match(PID,Residents)|T],NMS) :-
+    NMS = [match(PID,[RID|Residents])|T].
+add(RID,PID,[CMS|T],[CMS|Res]) :-
+    add(RID,PID,T,Res).
+
+remove(RID,PID,[match(PID,Residents)|T],[match(PID,NewResidents)|T]):-
+    delete(Residents,RID,NewResidents).
+remove(RID,PID,[CMS|T],[CMS|Res]) :-
+    remove(RID,PID,T,Res).
+
+% offerHelper(ResidentID, ROL, currentMatchSet, newMatchSet)
+offerHelper(RID, [], CMS, CMS).
+offerHelper(RID, [PID|T],CMS, NMS) :-
+    program(PID,_,Capacity,_),
+    member(match(PID, ProgResidents),CMS),
+    length(ProgResidents, Length),
+    offerCheck(RID,[PID|T],CMS,NMS,Length,Capacity,ProgResidents).
+offerCheck(RID,[PID|T],CMS,NMS,Length,Capacity,ProgResidents) :-
+     Length < Capacity,
+     !,
+     add(RID,PID,CMS,NMS).
