@@ -6,4 +6,4 @@ Github repo for the project: https://github.com/laurenhendley/CSI2120_ResMatchSe
 
 Ressources used:
 https://www.swi-prolog.org/pldoc/doc/_SWI_/library/lists.pl
-
+https://www.swi-prolog.org/pldoc/man?section=edinburghIO
