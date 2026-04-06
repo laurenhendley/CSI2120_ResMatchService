@@ -7,24 +7,28 @@
 :- consult(rp4000).
 
 %the code from the assignment description that prints displays the solution
+%PARAM:ResidentID, ProgramID
 writeMatchInfo(ResidentID,ProgramID):-
     resident(ResidentID,name(FN,LN),_),
     program(ProgramID,TT,_,_),write(LN),write(','),
     write(FN),write(','),write(ResidentID),write(','),
     write(ProgramID),write(','),writeln(TT).
 
+%PARAM:Matchset
 initialMatches(Ms):-
     findall(match(P,[]), program(P,_,_,_), Ms). %this query produces the initial match set with no matched residents, which is used as the starting point for the algorithm
 
+% Finds the resident's rank in the program
 % rankInProgram(ResidentID, ProgramID, Rank)
 rankInProgram(ID, PID, R):-
     program(PID, _, _, Rs), %finds the program PID and the list of the residents and their ranks in that program
     nth1(R, Rs, ID). %nth1 is 1 based indexing (found in the list section of the prolog documentation)
 
-% leastPreferred(ProgramID, ResidentID, LeastPreferredResidentID, RankOfThisResident)
+% leastPreferred(ProgramID, ResidentID, LeastPreferredResidentID,RankOfThisResident)
 leastPreferred(PID,[H], H, RankH):- %Base case if the list of resident IDs only contains one id
     rankInProgram(H, PID, RankH).
 
+%PARAM:ProgramID, list, leastpreferredresident, rank
 leastPreferred(PID, [H|T], LPR, RR):-
     rankInProgram(H, PID, RankH), %Checks the rank of the head of the list
     leastPreferred(PID, T, TID, TRank), %recursively checks the tail of the list and finds the least preferred resident and their rank
@@ -42,15 +46,19 @@ matched(RID,PID,[match(PID,Residents)| _]) :- %checks if the resident is in the 
 matched(RID,PID,[_| T]) :- %if not, then recursively checks the rest of the match set
     matched(RID,PID,T).
 
+%PARAM:residentid,programid, matchset, newmatchset
 add(RID,PID,[match(PID,Residents)|T],NMS) :- %adds the resident to the program in the match set
     NMS = [match(PID,[RID|Residents])|T].
 
+%PARAM:residentid, programid, matchset, newmatchset
 add(RID,PID,[CMS|T],[CMS|Res]) :- %recursivley goes through the match set until it finds the right program for the resident to be added to
     add(RID,PID,T,Res).
 
+%PARAM:residentid,programid,matchset,newmatchset
 remove(RID,PID,[match(PID,Residents)|T],[match(PID,NewResidents)|T]):- %removes the residetn from the program in the match set
-    delete(Residents,RID,NewResidents). 
+    delete(Residents,RID,NewResidents).
 
+%PARAM:residentid,programid,matchset,newmatchset
 remove(RID,PID,[CMS|T],[CMS|Res]) :- %recursivley goes through the match set until it finds the right program for the resident to be removed from
     remove(RID,PID,T,Res).
 
@@ -65,12 +73,15 @@ offerHelper(RID, [PID|T],CMS, NMS) :- %Checks the first program in the residents
     offerHelper(RID, T,CMS,NMS)
     ).
 
-
+% PARAM:residentid,list,matchset,newmatchset,length,capcity,program's
+% residents
 offerCheck(RID,[PID|T],CMS,NMS,Length,Capacity,ProgResidents) :- %if the program has the capacity for another resident, then we can add the resident to the program and return the new match set
      Length < Capacity,
      !,
      add(RID,PID,CMS,NMS).
-    
+
+% PARAM:residentid,list,matchset,newmatchset,length,capcity,program's
+% residents
 offerCheck(RID,[PID|T],CMS,NMS,Length,Capacity,ProgResidents) :- %checks if the program si full, if it is then checks if a resident is less preferred than the one making the offer
     Length >= Capacity,
     leastPreferred(PID, ProgResidents, LPR, RankLPR),
@@ -93,10 +104,12 @@ offer(RID, CMS, NMS) :- %this find the residents ROL and then call the offer hel
 shapleyHelper([], CurrentMatches, FinalMatches):-
     FinalMatches = CurrentMatches. %Base case, if there are no more residents to make offers, then we are done and can return the final match set
 
+%PARAM:list,current matches, final matches
 shapleyHelper([RID|T], CurrentMatches, FinalMatches):-
     offer(RID, CurrentMatches, NewMatches), %The resident makes an offer and we get the new match set
     shapleyHelper(T, NewMatches, FinalMatches). %We recursively call the helper function with the tail of the resident list and the new match set
 
+%PARAM:all rids, current matches, final matches
 stableMatch(RIDs, CurrentMatches, FinalMatches):-
     findall(RID, (member(RID, RIDs), \+ matched(RID, _, CurrentMatches)), UnmatchedRIDs), %Finds all the unmatched residents in the current match set
     (UnmatchedRIDs = [] -> %If there are no unmatched residents, then we are done and can return the final match set
