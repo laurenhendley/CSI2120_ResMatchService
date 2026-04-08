@@ -65,9 +65,40 @@
   )
 )
 
-(define (offer rinfo rlist plist matches))
+; HELPER - Updating matches
 
-(define (evaluate rinfo pinfo rlist plist matches))
+; Offer a program to a resident
+(define (offer rinfo rlist plist matches)
+  (cond ((null? (cadddr rinfo)) matches)
+        (else
+              (let* ((pid (car (cadddr rinfo)))
+                     (pinfo (get-program-info pid plist))
+                     (match (get-match pid matches))
+                     (rank_res (rank (car rinfo) (get-program-info pid plist)))
+                     (quota (caddr pinfo))
+                     (cur_res (cadr match))
+                     (rid (car rinfo)))
+                (cond ((< (length cur_res) quota) (add-resident-to-match (cons rid rank_res) match))
+                      ((>= (length cur_res) quota) (evaluate rinfo pinfo rlist plist matches)))
+  ))
+))
+
+; Evaluates whether a resident should be added based on their ranking
+(define (evaluate rinfo pinfo rlist plist matches)
+  (cond ((null? (cadddr rinfo)) matches)
+        (else (let * ((pid (car (cadddr rinfo)))
+                      (res_rank (rank (car rinfo) (get-program-info pid plist)))
+                      (match (get-match pid matches))
+                      (cur_res (cadr match))
+                      (lp (least-preferred cur_res))
+                      (lp_rank (cdr lp)))
+                (cond ((< lp_rank res_rank) ())
+                      (else ()))
+        ))
+))
+
+(define (gale-shapley))
+
 
 ; Given code below
 
